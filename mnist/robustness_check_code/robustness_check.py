@@ -2,10 +2,70 @@ import os
 import numpy as np
 from keras import backend as K
 import tensorflow as tf
+import numpy.linalg as la
 from keras.models import model_from_json
 from os.path import abspath
 import sys
+import json
 sys.path.append(abspath('./adversarial-robustness-toolbox'))
+
+
+def get_metrics(model, x_adv_samples, x, y):
+    scores = model.evaluate(x, y, verbose=0)
+    model_accuracy = scores[1] * 100
+
+    y_pred = model.predict(x, verbose=0)
+    y_pred_adv = model.predict(x_adv_samples, verbose=0)
+
+    # evaluate
+    scores = model.evaluate(x_adv_samples, y, verbose=0)
+
+    # obtain results/metrics
+    pert_metric = perturb_metric(x, x_adv_samples, y_pred, y_pred_adv, ord=2)
+    cmetric = conf_metric(x, x_adv_samples, y_pred, y_pred_adv, ord=2)
+    reduction_in_confidence = cmetric * 100
+
+    data = {
+        "model accuracy on test data:": model_accuracy,
+        "model accuracy on adversarial samples": scores[1] * 100,
+        "reduction in confidence": reduction_in_confidence,
+        "average perturbation": pert_metric * 100
+    }
+
+    print(json.dumps(data, indent=4, sort_keys=True))
+
+    return data
+
+
+def perturb_metric(x, x_adv, y_pred, y_pred_adv, ord=2):
+    idxs = (np.argmax(y_pred_adv, axis=1) != np.argmax(y_pred, axis=1))
+    if np.sum(idxs) == 0.0:
+        return 0
+
+    perts_norm = la.norm((x_adv - x).reshape(x.shape[0], -1), ord, axis=1)
+    perts_norm = perts_norm[idxs]
+
+    return np.mean(perts_norm / la.norm(x[idxs].reshape(np.sum(idxs), -1), ord, axis=1))
+
+
+# This computes the change in confidence for all images in the test set
+def conf_metric(x, x_adv, y_pred, y_pred_adv, ord=2):
+    y_classidx = np.argmax(y_pred, axis=1)
+    y_classconf = y_pred[np.arange(y_pred.shape[0]), y_classidx]
+
+    y_adv_classidx = np.argmax(y_pred_adv, axis=1)
+    y_adv_classconf = y_pred_adv[np.arange(y_pred_adv.shape[0]), y_adv_classidx]
+
+    idxs = (y_classidx == y_adv_classidx)
+    idxd = (y_classidx != y_adv_classidx)
+
+    if np.sum(idxs) == 0.0:
+        return 0
+
+    idxnonzero = y_classconf != 0
+    idxs = idxs & idxnonzero
+
+    return np.mean((y_classconf[idxs] - y_adv_classconf[idxs]) / y_classconf[idxs])
 
 
 def main(argv):
@@ -73,15 +133,17 @@ def main(argv):
 
     x_samples = crafter.generate(x)
     print(x_samples.shape)
+    scores = get_metrics(model, x_samples, x, y)
+    # scores = model.evaluate(x, y, verbose=0)
+    # model_accuracy = scores[1] * 100
+    #
+    # y_pred = model.predict(x, verbose=0)
+    # y_pred_adv = model.predict(x_samples, verbose=0)
+    #
+    # # evaluate
+    # scores = model.evaluate(x_samples, y, verbose=0)
 
-    scores = model.evaluate(x, y, verbose=0)
-    model_accuracy = scores[1] * 100
 
-    y_pred = model.predict(x, verbose=0)
-    y_pred_adv = model.predict(x_samples, verbose=0)
-
-    # evaluate
-    scores = model.evaluate(x_samples, y, verbose=0)
     print(scores)
     # # obtain results/metrics
     # pert_metric = self.perturb_metric(x, x_samples, y_pred, y_pred_adv, ord=2)
@@ -99,5 +161,3 @@ def main(argv):
 
 if __name__ == "__main__":
     main(sys.argv)
-
-
