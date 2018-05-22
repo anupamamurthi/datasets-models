@@ -86,12 +86,12 @@ print('Test accuracy:', score[1])
 
 
 # serialize weights to HDF5
-model_wt_path = os.environ["RESULT_DIR"] + "/keras_robust_fashion.hdf5"
+model_wt_path = os.environ["RESULT_DIR"] + "/keras_original_model.hdf5"
 model.save(model_wt_path)
 print("Model saved in file: %s" % model_wt_path)
 
 # serialize NN model to JSON
-model_def_path = os.environ["RESULT_DIR"] + "/keras_robust_fashion.json"
+model_def_path = os.environ["RESULT_DIR"] + "/keras_original_model.json"
 model_json = model.to_json()
 with open(model_def_path, "w") as json_file:
     json_file.write(model_json)
