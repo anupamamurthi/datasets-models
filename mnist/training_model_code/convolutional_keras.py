@@ -1,11 +1,11 @@
-
 from __future__ import print_function
-import keras
-import numpy as np
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, Flatten
 from keras.layers import Conv2D, MaxPooling2D
 from keras import backend as K
+
+import keras
+import numpy as np
 import sys
 import os
 
@@ -25,7 +25,7 @@ def main(argv):
     i = 1
     while i <= 2:
         arg = str(argv[i])
-        if arg == "--mnistData":
+        if arg == "--data":
             image_path = os.path.join(os.environ["DATA_DIR"], str(argv[i+1]))
         i += 2
 
@@ -84,15 +84,12 @@ print(score)
 print('Test loss:', score[0])
 print('Test accuracy:', score[1])
 
-
-# serialize weights to HDF5
 model_wt_path = os.environ["RESULT_DIR"] + "/keras_original_model.hdf5"
 model.save(model_wt_path)
-print("Model saved in file: %s" % model_wt_path)
+print("Model saved to file: %s" % model_wt_path)
 
-# serialize NN model to JSON
 model_def_path = os.environ["RESULT_DIR"] + "/keras_original_model.json"
 model_json = model.to_json()
 with open(model_def_path, "w") as json_file:
     json_file.write(model_json)
-print("Model definition saved in file: %s" % model_def_path)
+print("Model definition saved to file: %s" % model_def_path)
