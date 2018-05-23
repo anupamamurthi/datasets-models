@@ -129,6 +129,11 @@ def main(argv):
     metrics = get_metrics(model, x_samples, x, y)
 
     print(metrics)
+    
+    report_file = os.path.join(os.environ["RESULT_DIR"], "/report.txt")
+
+    with open(report_file, "w") as report:
+        report.write(metrics)
 
 
 if __name__ == "__main__":
