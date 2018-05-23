@@ -2,6 +2,7 @@ import os
 import sys
 import numpy as np
 import numpy.linalg as la
+import json
 
 # add ART to sys path
 from os.path import abspath
@@ -134,7 +135,7 @@ def main(argv):
     report_file = os.path.join(os.environ["RESULT_DIR"], "/report.txt")
 
     with open(report_file, "w") as report:
-        report.write(metrics)
+        report.write(json.dumps(metrics))
 
 
 if __name__ == "__main__":
