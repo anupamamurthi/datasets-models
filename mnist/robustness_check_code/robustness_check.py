@@ -2,12 +2,16 @@ import os
 import sys
 import numpy as np
 import numpy.linalg as la
+
+# add ART to sys path
+sys.path.append(abspath('./adversarial-robustness-toolbox'))
+
 from keras.models import model_from_json
 from os.path import abspath
 from art.classifiers.keras import KerasClassifier
 from keras.utils import np_utils
 from art.attacks.fast_gradient import FastGradientMethod
-sys.path.append(abspath('./adversarial-robustness-toolbox'))
+
 
 
 def get_metrics(model, x_original, x_adv_samples, y):
