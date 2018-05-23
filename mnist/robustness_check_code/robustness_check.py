@@ -4,6 +4,7 @@ import numpy as np
 import numpy.linalg as la
 
 # add ART to sys path
+from os.path import abspath
 sys.path.append(abspath('./adversarial-robustness-toolbox'))
 
 from keras.models import model_from_json
