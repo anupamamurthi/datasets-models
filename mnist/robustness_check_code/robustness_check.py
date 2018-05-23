@@ -132,10 +132,11 @@ def main(argv):
 
     print(metrics)
     
-    report_file = os.path.join(os.environ["RESULT_DIR"], "/report.txt")
+    report_file = os.path.join(os.environ["RESULT_DIR"], "report.txt")
 
     with open(report_file, "w") as report:
         report.write(json.dumps(metrics))
+    
 
 
 if __name__ == "__main__":
