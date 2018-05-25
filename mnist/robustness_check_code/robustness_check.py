@@ -131,7 +131,7 @@ def main(argv):
     # obtain all metrics (robustness score, perturbation metric, reduction in confidence)
     metrics = get_metrics(model, x,x_samples, y)
 
-    print(metrics)
+    print("metrics : ", metrics)
     
     report_file = os.path.join(os.environ["RESULT_DIR"], "report.txt")
 
