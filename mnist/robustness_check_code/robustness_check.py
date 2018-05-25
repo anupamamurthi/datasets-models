@@ -138,6 +138,9 @@ def main(argv):
     with open(report_file, "w") as report:
         report.write(json.dumps(metrics))
     
+    adv_samples_file = os.path.join(os.environ["RESULT_DIR"], 'adv_samples')
+    print("adversarial samples saved to : ", adv_samples_file)
+    np.savez(adv_samples_file, x_original=x_original, x_adversarial=x_adv_samples, y=y)
 
 
 if __name__ == "__main__":
